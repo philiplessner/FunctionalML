@@ -1,10 +1,8 @@
+# coding: utf-8
 from __future__ import print_function, division, unicode_literals
-import random
-from itertools import chain
 from functools import partial
 import matplotlib.pyplot as plt
 from toolz import take, compose, curry
-from toolz.curried import do, get
 import func_gradient_descent as fgd
 from utility import dot, until_within_tol, T, csv_reader, Scaler, prepend_x0
 
@@ -71,7 +69,7 @@ def gradJS(X, y, h_theta):
     return [(error(xi, yi, h_theta) * xj) / len(y) for xj in xi]
     
 @curry
-def lin_reg(cost_f, cost_df, h_theta0, data, alpha=0.1, it_max=500):
+def fit(cost_f, cost_df, h_theta0, data, alpha=0.1, it_max=500):
     '''
     Compute values of multiple linear regression coefficients
     Parameters
@@ -102,30 +100,3 @@ def plot_cost(cost):
     plt.semilogy(range(0, len(cost)), cost, 'b+')
     plt.show()
     plt.clf()
-
-
-if __name__ == '__main__':
-    Z, y = csv_reader('./data/Folds_small.csv', ['AT', 'V', 'AP', 'RH'], 'PE') 
-    
-    scale = Scaler(Z)
-    print(scale.stats)
-    transform = compose(prepend_x0, Scaler.normalize)
-    X = transform(scale)
-    
-    data = zip(X, y)
-    h_theta0 = [0., 0., 0., 0., 0.]
-    
-    h_thetaf, cost = lin_reg(J, gradJ, h_theta0, alpha=0.03, it_max=2000)(data)
-    plot_cost(cost)
-    h_thetad = scale.denormalize(h_thetaf)
-    yp = predict(X, h_thetaf)
-    
-    print('Coefficients\t', h_thetaf)
-    print('Predicted\tyi')
-    for (p, yi) in zip(yp, y):
-        print(p, '\t', yi)
-        
-    
-    print('******************')
-    print('Coefficients\t', h_thetad)  
-   
