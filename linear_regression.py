@@ -1,5 +1,6 @@
 # coding: utf-8
 from __future__ import print_function, division, unicode_literals
+import random
 from functools import partial
 import matplotlib.pyplot as plt
 from toolz import take, compose, curry
@@ -52,7 +53,7 @@ def gradJ(X, y, h_theta):
     return [dot(errors(X, y, h_theta), xj) / len(y) for xj in T(X)]
 
 
-def gradJS(X, y, h_theta):
+def gradJS(xi, yi, h_theta):
     '''
     Gradient of Cost function for stochastic gradient descent for
     Multiple linear regression
@@ -65,11 +66,11 @@ def gradJS(X, y, h_theta):
         Gradient of cost function (j cols, one for each h_thetaj)
         Will be used to update h_theta i gradient descent
     '''
-    xi, yi = random.choice(zip(X,y))
-    return [(error(xi, yi, h_theta) * xj) / len(y) for xj in xi]
+    #xi, yi = random.choice(zip(X,y))
+    return [(error(xi, yi, h_theta) * xj) for xj in xi]
     
 @curry
-def fit(cost_f, cost_df, h_theta0, data, alpha=0.1, it_max=500):
+def fit(cost_f, cost_df, h_theta0, data, alpha=0.1, it_max=500, gf='gd'):
     '''
     Compute values of multiple linear regression coefficients
     Parameters
@@ -83,9 +84,18 @@ def fit(cost_f, cost_df, h_theta0, data, alpha=0.1, it_max=500):
         Fitting parameters (j cols)
     '''
     X, y = zip(*data)
-    f = partial(cost_f, X, y)
-    df = partial(cost_df, X, y)
-    ans = list(take(it_max, ((e, f(e)) for e in fgd.gradient_descent(df, h_theta0, alpha=alpha))))
+    if gf == 'gd':
+        f = partial(cost_f, X, y)
+        df = partial(cost_df, X, y) 
+        ans = list(take(it_max, ((e, f(e)) for e in fgd.gradient_descent(df, h_theta0, alpha=alpha))))
+    elif gf == 'sgd':
+        #f = partial(cost_f, X, y)
+        df = cost_df 
+        ans = list(take(it_max, (e for e in fgd.sgd(df, X, y, h_theta0, alpha=alpha))))
+        return ans[-1]
+    else:
+        print('Not a valid function')
+        return    
     value = list(T(ans)[0])
     cost = list(T(ans)[1])
     #t = list(until_within_tol(cost, 1e-7))
