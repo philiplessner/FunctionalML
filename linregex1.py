@@ -24,7 +24,7 @@ h_thetaf, cost = lr.fit(lr.J,
                         lr.gradJ, 
                         h_theta0, 
                         alpha=0.3, 
-                        it_max=5000)(train_data)
+                        it_max=5000, gf='gd')(train_data)
 lr.plot_cost(cost)
 h_thetad = scale.denormalize(h_thetaf)
 X_train, y_train = zip(*train_data)
@@ -55,6 +55,29 @@ print(tabulate(list(zip(yp_test, y_test)),
 corr_test = metrics.r2(X_test, y_test, h_thetaf)
 print('R**2\t', corr_test)
 
+print('****Stochastic Gradient Descent****')
+h_thetaf = lr.fit(lr.J, 
+                  lr.gradJS, 
+                  h_theta0, 
+                  alpha=0.3, 
+                  it_max=5000, gf='sgd')(data)
+
+#lr.plot_cost(cost)
+print('Coefficients\t', h_thetaf)
+yp = lr.predict(X, h_thetaf)
+h_thetad = scale.denormalize(h_thetaf)
+print('Coefficients\t', h_thetaf)
+print(tabulate(list(zip(yp, y)), 
+                headers=['yp', 'yi'],
+                tablefmt='fancy_grid'))
+print('Coefficients\t', h_thetad)
+for i, h_theta in enumerate(h_thetad):
+    print('h_theta' + unicode(i), '\t', h_theta)
+
+corr_test = metrics.r2(X, y, h_thetaf)
+print('R**2\t', corr_test)
+
+print('****Numpy Solution****')
 Q = np.array([e + [1.] for e in Z])
 coeff = lstsq(Q, np.array(y))
 print(coeff)
