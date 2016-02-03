@@ -1,7 +1,7 @@
 from __future__ import print_function, division, unicode_literals
 import random
 from functools import partial
-from itertools import repeat
+from itertools import repeat, chain, cycle
 from toolz import iterate, take, accumulate, curry
 from utility import safe
 
@@ -31,6 +31,19 @@ def gradient_descent(df, x_0, alpha=0.1):
         Generator sequence of [x_i1, x_i2,...,x_ij] where i = 0 to ...
     '''
     return iterate(gradient_step(df, alpha), x_0)
+
+
+def sgd_step(df, alpha, prev_theta, xy_i):
+  """df is a function of x_i, y_i, theta"""
+  x_i, y_i = xy_i
+  gradient = df(x_i, y_i, prev_theta)
+  return [theta_j - alpha * df_j
+          for theta_j, df_j in zip(prev_theta, gradient)]
+
+
+def sgd(df, X, y, theta0, alpha=0.1):
+  xys = chain([theta0], cycle(zip(X, y)))
+  return accumulate(partial(sgd_step, df, alpha), xys)
     
     
 def gradient_descent2(f, df, x):
