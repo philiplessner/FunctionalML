@@ -66,19 +66,20 @@ def gradJS(xi, yi, h_theta):
         Gradient of cost function (j cols, one for each h_thetaj)
         Will be used to update h_theta i gradient descent
     '''
-    #xi, yi = random.choice(zip(X,y))
     return [(error(xi, yi, h_theta) * xj) for xj in xi]
     
 @curry
-def fit(cost_f, cost_df, h_theta0, data, alpha=0.1, it_max=500, gf='gd'):
+def fit(cost_f, cost_df, h_theta0, data, eta=0.1, it_max=500, gf='gd'):
     '''
     Compute values of multiple linear regression coefficients
     Parameters
         cost_f: Cost function (J)
         cost_df: gradient of cost function (gradJ for batch and gradJS for stochastic)
+        h_theta0: initial guess for fitting parameters (j cols)
+        data: list of tuples [(Xi, yi)]
         X: matrix of independent variables (i rows of observations and j cols of variables). x0=1 for all i
         y: dependent variable (i rows)
-        h_theta0: initial guess for fitting parameters (j cols)
+        eta: learning rate
         it_max: maximum number of iterations
     Returns
         Fitting parameters (j cols)
@@ -87,19 +88,20 @@ def fit(cost_f, cost_df, h_theta0, data, alpha=0.1, it_max=500, gf='gd'):
     if gf == 'gd':
         f = partial(cost_f, X, y)
         df = partial(cost_df, X, y) 
-        ans = list(take(it_max, ((e, f(e)) for e in fgd.gradient_descent(df, h_theta0, alpha=alpha))))
+        ans = list(take(it_max, ((e, f(e)) for e in fgd.gradient_descent(df, h_theta0, eta=eta))))
+        value = list(T(ans)[0])
+        cost = list(T(ans)[1])
+        #t = list(until_within_tol(cost, 1e-7))
+        return value[-1], cost 
     elif gf == 'sgd':
         #f = partial(cost_f, X, y)
         df = cost_df 
-        ans = list(take(it_max, (e for e in fgd.sgd(df, X, y, h_theta0, alpha=alpha))))
+        ans = list(take(it_max, (e for e in fgd.sgd(df, X, y, h_theta0, eta=eta))))
         return ans[-1]
     else:
         print('Not a valid function')
         return    
-    value = list(T(ans)[0])
-    cost = list(T(ans)[1])
-    #t = list(until_within_tol(cost, 1e-7))
-    return value[-1], cost
+    
     
 @curry
 def predict(X, h_theta):

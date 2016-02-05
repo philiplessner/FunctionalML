@@ -23,7 +23,7 @@ h_theta0 = [0., 0., 0., 0., 0.]
 h_thetaf, cost = lr.fit(lr.J, 
                         lr.gradJ, 
                         h_theta0, 
-                        alpha=0.3, 
+                        eta=0.3, 
                         it_max=5000, gf='gd')(train_data)
 lr.plot_cost(cost)
 h_thetad = scale.denormalize(h_thetaf)
@@ -59,7 +59,7 @@ print('****Stochastic Gradient Descent****')
 h_thetaf = lr.fit(lr.J, 
                   lr.gradJS, 
                   h_theta0, 
-                  alpha=0.3, 
+                  eta=0.3, 
                   it_max=5000, gf='sgd')(data)
 
 #lr.plot_cost(cost)
