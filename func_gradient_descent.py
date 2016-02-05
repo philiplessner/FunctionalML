@@ -7,43 +7,46 @@ from utility import safe
 
 
 @curry
-def gradient_step(df, eta, x_i):
+def gradient_step(df, eta, theta_k):
     '''
-    Calculate x_i+1 from x_i taking a step in negative direction of gradient
-    x is a j dimensional vector [x1, x2,...,xj]
+    Calculate theta_k+1 from theta_k
+    by taking step in negative direction of gradient 
+    theta is a j dimensional vector
     Parameters
         df: Gradient of function f [df1, df2,...,dfj]
         eta: Learning rate
-        x_i: [x_i1, x_i2,...,x_ij]
+        theta_k: [theta_k1, theta_k2,...,theta_kj]
     Returns
-       [x_i+11, x_i+12,...,x_i+1j] 
+       [theta_k+11, theta_k+12,...,thetak_k+1j] 
     '''
-    return [x_ij - eta * df_j for x_ij, df_j in zip(x_i, df(x_i))]
+    return [theta_k - eta * df_k 
+                                for theta_k, df_k in zip(theta_k, df(theta_k))]
     
 
-def gradient_descent(df, theta0, eta=0.1):
+def gradient_descent(df, theta_0, eta=0.1):
     '''
     Parameters
         df: Gradient of function f
         theta0: Initial guess, theta ia a j dimensional vector ([theta_01, theta_02,...,theta0_0j])
         eta: Learning rate
     Returns
-        Generator sequence of [x_i1, x_i2,...,x_ij] where i = 0 to ...
+        Generator sequence of [theta_k1, theta_k2,...,theta_kj] 
+        where k = 0 to ...
     '''
-    return iterate(gradient_step(df, eta), theta0)
+    return iterate(gradient_step(df, eta), theta_0)
 
 
-def sgd_step(df, eta, prev_theta, xy_i):
+def sgd_step(df, eta, theta_k, xy_i):
     '''
     df is a function of x_i, y_i, theta
     '''
     x_i, y_i = xy_i
-    gradient = df(x_i, y_i, prev_theta)
-    return [theta_j - eta * df_j
-            for theta_j, df_j in zip(prev_theta, gradient)]
+    gradient = df(x_i, y_i, theta_k)
+    return [theta_k - eta * df_k
+            for theta_k, df_k in zip(theta_k, gradient)]
 
 
-def sgd(df, X, y, theta0, eta=0.1):
+def sgd(df, X, y, theta_0, eta=0.1):
     '''
     Parameters
         df: Gradient of function f
@@ -52,9 +55,10 @@ def sgd(df, X, y, theta0, eta=0.1):
         theta0: Initial guess, theta ia a j dimensional vector ([theta_01, theta_02,...,theta0_0j])
         eta: Learning rate
     Returns
-        Generator sequence of [x_i1, x_i2,...,x_ij] where i = 0 to ...
+        Generator sequence of [theta_k1, theta_k2,...,theta_kj] 
+        where k = 0 to ...
     ''' 
-    xys = chain([theta0], cycle(zip(X, y)))
+    xys = chain([theta_0], cycle(zip(X, y)))
     return accumulate(partial(sgd_step, df, eta), xys)
     
     

@@ -66,7 +66,6 @@ h_thetaf = lr.fit(lr.J,
 print('Coefficients\t', h_thetaf)
 yp = lr.predict(X, h_thetaf)
 h_thetad = scale.denormalize(h_thetaf)
-print('Coefficients\t', h_thetaf)
 print(tabulate(list(zip(yp, y)), 
                 headers=['yp', 'yi'],
                 tablefmt='fancy_grid'))

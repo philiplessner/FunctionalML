@@ -88,7 +88,9 @@ def fit(cost_f, cost_df, h_theta0, data, eta=0.1, it_max=500, gf='gd'):
     if gf == 'gd':
         f = partial(cost_f, X, y)
         df = partial(cost_df, X, y) 
-        ans = list(take(it_max, ((e, f(e)) for e in fgd.gradient_descent(df, h_theta0, eta=eta))))
+        ans = list(take(it_max, 
+                        ((h_theta, f(h_theta)) for h_theta in 
+                          fgd.gradient_descent(df, h_theta0, eta=eta))))
         value = list(T(ans)[0])
         cost = list(T(ans)[1])
         #t = list(until_within_tol(cost, 1e-7))
