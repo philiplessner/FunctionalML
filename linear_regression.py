@@ -53,18 +53,22 @@ def gradJ(X, y, h_theta):
     return [dot(errors(X, y, h_theta), xj) / len(y) for xj in T(X)]
 
 
+def JS(xi, yi, h_theta):
+    return 0.5 * error(xi, yi, h_theta)**2
+
+
 def gradJS(xi, yi, h_theta):
     '''
     Gradient of Cost function for stochastic gradient descent for
     Multiple linear regression
     Uses a single observation to compute gradient
     Parameters
-        X: matrix of independent variables (i rows of observations and j cols of variables). x0=1 for all i
-        y: dependent variable (i rows)
-        h_theta: coefficients (j cols) 
+        xi: x vector (length j+1) for training example i
+        yi: y observation for training example i
+        h_theta: vector of parameters (theta0...thetaj) 
     Returns
         Gradient of cost function (j cols, one for each h_thetaj)
-        Will be used to update h_theta i gradient descent
+        Will be used to update h_theta in gradient descent
     '''
     return [(error(xi, yi, h_theta) * xj) for xj in xi]
     
