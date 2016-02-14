@@ -146,21 +146,29 @@ def csv_reader(fpath, Xcols, ycol):
 
 
 class Scaler(object):
-    def __init__(self, X):
-        self.X = X
-        self.stats = self._mr()
-    
-    def _mr(self):
-        return [self._mr_j(xj) for xj in T(self.X)]
+            
+    def _mr(self, X):
+        return [self._mr_j(xj) for xj in T(X)]
     
     def _mr_j(self, xj):
         r = max(xj) - min(xj)
         m = mean(xj)
         return m, r
+    
+    def fit(self, X):
+        '''
+        Calculate mean and range for each feature
+        Parameter
+        X: matrix of j features and i observations for each feature
+        '''
+        self.stats = self._mr(X)
 
-    def normalize(self):
+    def transform(self, X):
+        '''
+        Normalize each feature u = (xj - mean)/range
+        '''
         u = []
-        for j, xj in enumerate(T(self.X)):
+        for j, xj in enumerate(T(X)):
             m, r = self.stats[j]
             u.append([(xi - m) / r for xi in xj])
         return T(u)
