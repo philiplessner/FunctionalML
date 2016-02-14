@@ -22,12 +22,15 @@ Xpp = [list(e) for e in Xp]
 print(Xpp)
 print(y)
 
-# Scale the data
-scale = Scaler(Xpp)
-transform = compose(prepend_x0, Scaler.normalize)
-scaledX = transform(scale)
 # Split set into training and testing data
-train_data, test_data = train_test_split(zip(scaledX, y), 0.33)
+train_data, test_data = train_test_split(zip(Xpp, y), 0.33)
+# Scale the data
+X_train, y_train = zip(*train_data)
+scale = Scaler()
+scale.fit(X_train)
+transform = compose(prepend_x0, scale.transform)
+scaledX_train = transform(X_train)
+scaled_train = zip(scaledX_train, y_train)
 # Fit the training data
 h_theta0 = [1., 1., 1.]
 print('****Gradient Descent****')
@@ -35,18 +38,22 @@ print('--Training--')
 h_thetaf, cost = logr.logistic_reg(logr.logistic_log_likelihood,
                                 logr.grad_logistic,
                                 h_theta0,
-                                train_data,
+                                scaled_train,
                                 it_max=500)
 
 logr.plot_cost(cost)
 print(h_thetaf)
 
-for xi, yi in train_data:
+for xi, yi in scaled_train:
     ypi = logr.logistic(dot(h_thetaf, xi))
     print(yi, ypi, round(ypi))
 
 print('--Testing--')
-for xi, yi in test_data:
+# Use the training statistics to scale the test data
+X_test, y_test = zip(*test_data)
+scaledX_test = transform(X_test)
+scaled_test = zip(scaledX_test, y_test)
+for xi, yi in scaled_test:
     ypi = logr.logistic(dot(h_thetaf, xi))
     print(yi, ypi, round(ypi))
 
