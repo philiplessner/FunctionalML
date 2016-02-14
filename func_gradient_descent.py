@@ -46,6 +46,14 @@ def sgd_step(df, eta, theta_k, xy_i):
             for theta_k, df_k in zip(theta_k, gradient)]
 
 
+def in_random_order(data):
+    """generator that returns the elements of data in random order"""
+    indexes = [i for i, _ in enumerate(data)]  # create a list of indexes
+    random.shuffle(indexes)                    # shuffle them
+    for i in indexes:                          # return the data in that order
+        yield data[i]
+
+
 def sgd(df, X, y, theta_0, eta=0.1):
     '''
     Parameters
@@ -58,7 +66,7 @@ def sgd(df, X, y, theta_0, eta=0.1):
         Generator sequence of [theta_k1, theta_k2,...,theta_kj] 
         where k = 0 to ...
     ''' 
-    xys = chain([theta_0], cycle(zip(X, y)))
+    xys = chain([theta_0], in_random_order(zip(X, y)))
     return accumulate(partial(sgd_step, df, eta), xys)
     
     

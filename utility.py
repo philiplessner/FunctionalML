@@ -1,5 +1,6 @@
 from __future__ import print_function, division, unicode_literals
 import csv
+import random
 from functools import partial
 from math import sqrt
 from toolz import accumulate, iterate, take, curry
@@ -104,7 +105,13 @@ def dot(a, b):
     '''
     assert len(a) == len(b)
     return sum(ai * bj for (ai, bj) in zip(a, b))
+
+
+def vector_add(v, w):
+    """adds two vectors componentwise"""
+    return [v_i + w_i for v_i, w_i in zip(v, w)]
     
+
 def mean(x):
     '''
     Mean
@@ -168,4 +175,15 @@ class Scaler(object):
 
 def prepend_x0(X):
     return [[1.] + e for e in X]
-    
+
+
+def cyclewshuffle(iterable):
+    # cycle('ABCD') --> A B C D A B C D A B C D ...
+    saved = []
+    for element in iterable:
+        yield element
+        saved.append(element)
+    while saved:
+        random.shuffle(saved)
+        for element in saved:
+              yield element

@@ -18,3 +18,23 @@ def r2(X, y, h_theta):
     sum_of_squared_errors = sum(error(xi, yi, h_theta) ** 2
                                 for xi, yi in zip(X, y))
     return 1.0 - sum_of_squared_errors / total_sum_of_squares(y)
+    
+
+def accuracy(tp, fp, fn, tn):
+    correct = tp + tn
+    total = tp + fp + fn + tn
+    return correct / total
+
+
+def precision(tp, fp, fn, tn):
+    return tp / (tp + fp)
+
+
+def recall(tp, fp, fn, tn):
+    return tp / (tp + fn)
+
+
+def f1_score(tp, fp, fn, tn):
+    p = precision(tp, fp, fn, tn)
+    r = recall(tp, fp, fn, tn)
+    return 2 * p * r / (p + r)

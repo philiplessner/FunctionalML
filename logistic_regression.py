@@ -3,8 +3,10 @@ import random
 from math import exp, log
 from functools import partial
 from itertools import chain
+import matplotlib.pyplot as plt
 from toolz import take, thread_first, curry, compose
 import func_gradient_descent as fgd
+from ml_util import train_test_split
 from utility import dot, until_within_tol, T, Scaler, prepend_x0
 
 
@@ -19,6 +21,11 @@ def logistic_log_likelihood_i(x_i, y_i, h_theta):
 def logistic_log_likelihood(X, y, h_theta):
     return sum(logistic_log_likelihood_i(x_i, y_i, h_theta) for x_i, y_i in zip(X, y))
     
+def logistic_log_gradient_i(x_i, y_i, beta):
+    """the gradient of the log likelihood
+    corresponding to the ith data point"""
+    return [logistic_log_partial_ij(x_i, y_i, beta, j) for j, _ in enumerate(beta)]
+    
 
 def grad_logistic(X, y, h_theta):
     errors =[logistic(dot(h_theta, xi)) - yi for (xi, yi) in zip(X, y)]
@@ -29,13 +36,17 @@ def logistic_reg(cost_f, cost_df, h_theta0, data, it_max=500):
     X, y = zip(*data) 
     f = partial(cost_f, X, y)
     df = partial(cost_df, X, y)
-    ans = list(take(it_max, ((e, f(e)) for e in fgd.gradient_descent(df, h_theta0, alpha=0.1))))
+    ans = list(take(it_max, ((e, f(e)) for e in fgd.gradient_descent(df, h_theta0, eta=0.03))))
     value = list(T(ans)[0])
     cost = list(T(ans)[1])
-    print(cost)
-    print(value)
-    t = list(until_within_tol(cost, 1e-7))
-    return value[len(t) - 1] 
+    #t = list(until_within_tol(cost, 1e-7))
+    return value[-1], cost 
+    
+
+def plot_cost(cost):
+    plt.plot(range(0, len(cost)), cost, 'b+')
+    plt.show()
+    plt.clf()
     
 
 if __name__ == "__main__":
@@ -47,14 +58,29 @@ if __name__ == "__main__":
     # each element is paid_account
     y = [row[2] for row in data]        
     scale = Scaler(Z)
-    print(scale.stats)
     transform = compose(prepend_x0, Scaler.normalize)
     X = transform(scale)
     data = zip(X, y) 
+    train_data, test_data = train_test_split(data, 0.33)
     h_theta0 = [1., 1., 1.]
-    h_thetaf = logistic_reg(logistic_log_likelihood, grad_logistic, h_theta0, data, it_max=500)
+    h_thetaf, cost = logistic_reg(logistic_log_likelihood, grad_logistic, h_theta0, train_data, it_max=5000)
     print(h_thetaf)
     h_thetad = scale.denormalize(h_thetaf)
     print(h_thetad)
-    
+    plot_cost(cost)
+    true_positives = false_positives = true_negatives = false_negatives = 0
+    for x_i, y_i in test_data:
+        predict = logistic(dot(h_thetaf, x_i))
+        if y_i == 1 and predict >= 0.5:  # TP: paid and we predict paid
+            true_positives += 1
+        elif y_i == 1:                   # FN: paid and we predict unpaid
+            false_negatives += 1
+        elif predict >= 0.5:             # FP: unpaid and we predict paid
+            false_positives += 1
+        else:                             #  TN: unpaid and we predict unpaid
+            true_negatives += 1
+    precision = true_positives / (true_positives + false_positives)
+    recall = true_positives / (true_positives + false_negatives)
+    print('Precision: ', precision)
+    print('Recall: ', recall)
     

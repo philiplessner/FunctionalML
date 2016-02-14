@@ -1,5 +1,6 @@
 # coding: utf-8
 from __future__ import print_function, division, unicode_literals
+from functools import partial
 from toolz import compose
 from tabulate import tabulate
 from utility import csv_reader, Scaler, prepend_x0
@@ -56,13 +57,14 @@ corr_test = metrics.r2(X_test, y_test, h_thetaf)
 print('R**2\t', corr_test)
 
 print('****Stochastic Gradient Descent****')
-h_thetaf = lr.fit(lr.J, 
-                  lr.gradJS, 
+alpha = 0.0
+h_thetaf, cost = lr.fit(partial(lr.ES, alpha=alpha),
+                  partial(lr.gradES, alpha=alpha),
                   h_theta0, 
-                  eta=0.3, 
-                  it_max=5000, gf='sgd')(data)
+                  eta=0.3,
+                  it_max=500, gf='sgd')(data)
 
-#lr.plot_cost(cost)
+lr.plot_cost(cost)
 print('Coefficients\t', h_thetaf)
 yp = lr.predict(X, h_thetaf)
 h_thetad = scale.denormalize(h_thetaf)

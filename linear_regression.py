@@ -5,7 +5,7 @@ from functools import partial
 import matplotlib.pyplot as plt
 from toolz import take, compose, curry
 import func_gradient_descent as fgd
-from utility import dot, until_within_tol, T, csv_reader, Scaler, prepend_x0
+from utility import dot, until_within_tol, T, prepend_x0, vector_add
 
 
 def error(xi, yi, h_theta):
@@ -72,6 +72,27 @@ def gradJS(xi, yi, h_theta):
     '''
     return [(error(xi, yi, h_theta) * xj) for xj in xi]
     
+    
+def R(h_theta, alpha):
+  return 0.5 * alpha * dot(h_theta[1:], h_theta[1:])
+
+
+def ES(xi, yi, h_theta, alpha=0.0):
+    """estimate error plus ridge penalty on h_theta"""
+    return JS(xi, yi, h_theta) + R(h_theta, alpha)
+
+
+def gradR(h_theta, alpha):
+    """gradient of just the ridge penalty"""
+    return [0] + [alpha * h_theta_j for h_theta_j in h_theta[1:]]
+
+
+def gradES(x_i, y_i, h_theta, alpha=0.0):
+    """the gradient corresponding to the ith squared error term
+    including the ridge penalty"""
+    return vector_add(gradJS(x_i, y_i, h_theta), gradR(h_theta, alpha))
+
+    
 @curry
 def fit(cost_f, cost_df, h_theta0, data, eta=0.1, it_max=500, gf='gd'):
     '''
@@ -100,10 +121,16 @@ def fit(cost_f, cost_df, h_theta0, data, eta=0.1, it_max=500, gf='gd'):
         #t = list(until_within_tol(cost, 1e-7))
         return value[-1], cost 
     elif gf == 'sgd':
-        #f = partial(cost_f, X, y)
-        df = cost_df 
-        ans = list(take(it_max, (e for e in fgd.sgd(df, X, y, h_theta0, eta=eta))))
-        return ans[-1]
+        df = cost_df
+        cost = [sum(cost_f(xi, yi, h_theta0) for xi, yi in data)]
+        h_theta = h_theta0
+        eta_new = eta
+        for _ in xrange(it_max):
+            ans = list(take(len(y), (e for e in fgd.sgd(df, X, y, h_theta, eta=eta_new))))
+            h_theta = ans[-1]
+            cost.append(sum(cost_f(xi, yi, h_theta) for xi, yi in data))
+            eta_new = 0.99 * eta_new
+        return h_theta, cost
     else:
         print('Not a valid function')
         return    
