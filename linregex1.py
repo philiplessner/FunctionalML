@@ -1,11 +1,12 @@
 # coding: utf-8
 from __future__ import print_function, division, unicode_literals
 from functools import partial
-from toolz import compose
+from toolz import compose, identity
 from tabulate import tabulate
 from utility import csv_reader, Scaler, prepend_x0
 import metrics
 import linear_regression as lr
+import glm
 from ml_util import train_test_split
 import numpy as np
 from numpy.linalg import lstsq
@@ -29,14 +30,14 @@ X_test = transform(Z_test)
 
 h_theta0 = [0., 0., 0., 0., 0.]
 print('****Gradient Descent****')
-h_thetaf, cost = lr.fit(lr.J, 
+h_thetaf, cost = glm.fit(lr.J, 
                         lr.gradJ, 
                         h_theta0, 
                         eta=0.3, 
                         it_max=5000, gf='gd')(scaledtrain_data)
 lr.plot_cost(cost)
 h_thetad = scale.denormalize(h_thetaf)
-yp_train = lr.predict(X_train, h_thetaf)
+yp_train = glm.predict(identity, X_train, h_thetaf)
 
 print('\n--Training--')
 print('Coefficients\t', h_thetaf)
@@ -53,7 +54,7 @@ corr_train = metrics.r2(X_train, y_train, h_thetaf)
 print('R**2\t', corr_train)
 
 print('\n--Testing--')
-yp_test = lr.predict(X_test, h_thetaf)
+yp_test = glm.predict(identity, X_test, h_thetaf)
 print(tabulate(list(zip(yp_test, y_test)), 
                 headers=['yp', 'yi'],
                 tablefmt='fancy_grid'))
@@ -63,7 +64,7 @@ print('R**2\t', corr_test)
 print('\n\n****Stochastic Gradient Descent****')
 print('\n--Training--')
 alpha = 0.0
-h_thetaf, cost = lr.fit(partial(lr.ES, alpha=alpha),
+h_thetaf, cost = glm.fit(partial(lr.ES, alpha=alpha),
                   partial(lr.gradES, alpha=alpha),
                   h_theta0, 
                   eta=0.1,
@@ -71,7 +72,7 @@ h_thetaf, cost = lr.fit(partial(lr.ES, alpha=alpha),
 
 lr.plot_cost(cost)
 print('Coefficients\t', h_thetaf)
-yp_train = lr.predict(X_train, h_thetaf)
+yp_train = glm.predict(identity, X_train, h_thetaf)
 h_thetad = scale.denormalize(h_thetaf)
 print(tabulate(list(zip(yp_train, y_train)), 
                 headers=['yp', 'yi'],
@@ -84,7 +85,7 @@ corr_train = metrics.r2(X_train, y_train, h_thetaf)
 print('R**2\t', corr_train)
 
 print('\n--Testing--')
-yp_test = lr.predict(X_test, h_thetaf)
+yp_test = glm.predict(identity, X_test, h_thetaf)
 print(tabulate(list(zip(yp_test, y_test)), 
                 headers=['yp', 'yi'],
                 tablefmt='fancy_grid'))
