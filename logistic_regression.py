@@ -20,11 +20,18 @@ def logistic_log_likelihood_i(x_i, y_i, h_theta):
     
 def logistic_log_likelihood(X, y, h_theta):
     return sum(logistic_log_likelihood_i(x_i, y_i, h_theta) for x_i, y_i in zip(X, y))
+
+
+def logistic_log_partial_ij(x_i, y_i, h_theta, j):
+    """here i is the index of the data point,
+    j the index of the derivative"""
+    return (y_i - logistic(dot(x_i, h_theta))) * x_i[j]
+   
     
-def logistic_log_gradient_i(x_i, y_i, beta):
+def logistic_log_gradient_i(x_i, y_i, h_theta):
     """the gradient of the log likelihood
     corresponding to the ith data point"""
-    return [logistic_log_partial_ij(x_i, y_i, beta, j) for j, _ in enumerate(beta)]
+    return [logistic_log_partial_ij(x_i, y_i, h_theta, j) for j, _ in enumerate(h_theta)]
     
 
 def grad_logistic(X, y, h_theta):
@@ -41,6 +48,11 @@ def logistic_reg(cost_f, cost_df, h_theta0, data, it_max=500):
     cost = list(T(ans)[1])
     #t = list(until_within_tol(cost, 1e-7))
     return value[-1], cost 
+
+
+@curry
+def predict(f, X, h_theta):
+    return [f(dot(h_theta, xi)) for xi in X]
     
 
 def plot_cost(cost):
