@@ -25,7 +25,7 @@ def logistic_log_likelihood(X, y, h_theta):
 def logistic_log_partial_ij(x_i, y_i, h_theta, j):
     """here i is the index of the data point,
     j the index of the derivative"""
-    return (y_i - logistic(dot(x_i, h_theta))) * x_i[j]
+    return (logistic(dot(x_i, h_theta)) - y_i) * x_i[j]
    
     
 def logistic_log_gradient_i(x_i, y_i, h_theta):
