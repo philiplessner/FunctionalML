@@ -32,8 +32,39 @@ h_theta0 = [1., 1., 1.]
 h_thetaf, cost = glm.fit(logr.logistic_log_likelihood,
                          logr.grad_logistic, 
                          h_theta0, 
-                         scaled_train, 
-                         it_max=5000)
+                         scaled_train,
+                         eta=0.1,
+                         it_max=1000,
+                         gf='gd')
+print('--Training--\n')
+print(h_thetaf)
+h_thetad = scale.denormalize(h_thetaf)
+print(h_thetad)
+logr.plot_cost(cost)
+probs_train = glm.predict(logr.logistic, scaledX_train, h_thetaf)
+yp_train = logr.logistic_classes(probs_train)
+logistic_table(probs_train, yp_train, y_train)
+print('--Testing--\n')
+probs_test = glm.predict(logr.logistic, scaledX_test, h_thetaf)
+yp_test = logr.logistic_classes(probs_test)
+logistic_table(probs_test, yp_test, y_test)
+score = metrics.Scores(y_test, yp_test)
+print('True Positives\t', score.tp)
+print('False Positives\t', score.fp)
+print('False Negatives\t', score.fn)
+print('True Negatives\t', score.tn)
+print('Precision: ', score.precision())
+print('Recall: ', score.recall())
+
+print('****Stochastic Gradient Descent****\n')
+h_theta0 = [1., 1., 1.]
+h_thetaf, cost = glm.fit(logr.logistic_log_likelihood_i,
+                         logr.logistic_log_gradient_i, 
+                         h_theta0, 
+                         scaled_train,
+                         eta=0.5,
+                         it_max=1000,
+                         gf='sgd')
 print('--Training--\n')
 print(h_thetaf)
 h_thetad = scale.denormalize(h_thetaf)
