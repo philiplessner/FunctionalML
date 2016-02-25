@@ -2,6 +2,7 @@
 from __future__ import print_function, division, unicode_literals
 import matplotlib.pyplot as plt
 from toolz import take
+from tabulate import tabulate
 from func_gradient_descent import gradient_descent
 
 
@@ -16,3 +17,9 @@ def plot_lrates(f, df, x0, etas, niter):
     plt.legend(title='Learning Rate')
     plt.show()
     plt.clf()
+
+    
+def logistic_table(probs, yp, y):   
+    print(tabulate(list(zip(probs, yp, y)), 
+                headers=['Probability', 'Predicted Class', 'Actual Class'],
+                tablefmt='fancy_grid'))

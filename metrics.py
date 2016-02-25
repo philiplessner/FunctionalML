@@ -19,36 +19,35 @@ def r2(X, y, h_theta):
     sum_of_squared_errors = sum(error(xi, yi, h_theta) ** 2
                                 for xi, yi in zip(X, y))
     return 1.0 - sum_of_squared_errors / total_sum_of_squares(y)
+
+
+class Scores(object):
+    def __init__(self, y, yp):
+        true_positives = false_positives = true_negatives = false_negatives = 0
+        for yi, ypi in zip(y, yp):
+            if yi == 1 and ypi == 1:
+                true_positives += 1
+            elif yi == 1 and ypi == 0:
+                false_negatives += 1
+            elif yi == 0 and ypi == 1:
+                false_positives += 1
+            else:
+                true_negatives += 1
+        self.tp = true_positives
+        self.fn = false_negatives
+        self.fp = false_positives
+        self.tn = true_negatives
     
-def scores(y, yp):
-    true_positives = false_positives = true_negatives = false_negatives = 0
-    for yi, ypi in zip(y, yp):
-        if yi == 1 and ypi == 1:
-            true_positives += 1
-        elif yi == 1 and ypi == 0:
-            false_negatives += 1
-        elif yi == 0 and ypi == 1:
-            false_positives += 1
-        else:
-            true_negatives += 1
-    return true_positives, false_positives, false_negatives, true_negatives
-
-
-def accuracy(tp, fp, fn, tn):
-    correct = tp + tn
-    total = tp + fp + fn + tn
-    return correct / total
-
-
-def precision(tp, fp, fn, tn):
-    return tp / (tp + fp)
-
-
-def recall(tp, fp, fn, tn):
-    return tp / (tp + fn)
-
-
-def f1_score(tp, fp, fn, tn):
-    p = precision(tp, fp, fn, tn)
-    r = recall(tp, fp, fn, tn)
-    return 2 * p * r / (p + r)
+    def accuracy(self):
+        correct = self.tp + self.tn
+        total = self.tp + self.fp + self.fn + self.tn
+        return correct / total
+    
+    def precision(self):
+        return self.tp / (self.tp + self.fp)
+        
+    def recall(self):
+        return self.tp / (self.tp + self.fn)
+        
+    def f1_score(self):
+       return 2 * self.precision() * self.recall() / (self.precision() + self.recall()) 

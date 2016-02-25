@@ -2,6 +2,7 @@
 from __future__ import print_function, division, unicode_literals
 from math import exp, log
 import matplotlib.pyplot as plt
+from toolz import compose
 from utility import dot, T
 
 
@@ -32,7 +33,11 @@ def logistic_log_gradient_i(x_i, y_i, h_theta):
 def grad_logistic(X, y, h_theta):
     errors =[logistic(dot(h_theta, xi)) - yi for (xi, yi) in zip(X, y)]
     return [dot(errors, xj) for xj in T(X)]
-    
+
+
+def logistic_classes(logistic_probs):
+    return map(compose(int, round), logistic_probs)
+  
 
 def plot_cost(cost):
     plt.plot(range(0, len(cost)), cost, 'b+')
