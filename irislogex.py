@@ -5,6 +5,7 @@ from tabulate import tabulate
 from utility import csv_reader, Scaler, prepend_x0, dot
 import logistic_regression as logr
 import glm
+from out_utils import logistic_table
 from ml_util import train_test_split
 
 
@@ -33,8 +34,8 @@ scaledX_train = transform(X_train)
 scaled_train = zip(scaledX_train, y_train)
 # Fit the training data
 h_theta0 = [1., 1., 1.]
-print('****Gradient Descent****')
-print('--Training--')
+print('****Gradient Descent****\n')
+print('--Training--\n')
 h_thetaf, cost = glm.fit(logr.logistic_log_likelihood,
                                 logr.grad_logistic,
                                 h_theta0,
@@ -46,21 +47,17 @@ h_thetaf, cost = glm.fit(logr.logistic_log_likelihood,
 logr.plot_cost(cost)
 print(h_thetaf)
 
-yp_train = glm.predict(logr.logistic, scaledX_train, h_thetaf)
-print(tabulate(list(zip(yp_train, map(round, yp_train), y_train)), 
-                headers=['yp', 'Predicted Class', 'Actual Class'],
-                tablefmt='fancy_grid'))
-
-print('--Testing--')
+probs_train = glm.predict(logr.logistic, scaledX_train, h_thetaf)
+yp_train = logr.logistic_classes(probs_train)
+logistic_table(probs_train, yp_train, y_train)
+print('--Testing--\n')
 # Use the training statistics to scale the test data
 X_test, y_test = zip(*test_data)
 scaledX_test = transform(X_test)
 scaled_test = zip(scaledX_test, y_test)
-yp_test = glm.predict(logr.logistic, scaledX_test, h_thetaf)
-print(tabulate(list(zip(yp_test, map(round, yp_test), y_test)), 
-                headers=['yp', 'Predicted Class', 'Actual Class'],
-                tablefmt='fancy_grid'))
-
+probs_test = glm.predict(logr.logistic, scaledX_test, h_thetaf)
+yp_test = logr.logistic_classes(probs_test)
+logistic_table(probs_test, yp_test, y_test)
 print('\n\n****Stochastic Gradient Descent****')
 print('\n--Training--')
 h_thetaf, cost = glm.fit(logr.logistic_log_likelihood_i,
@@ -73,17 +70,14 @@ h_thetaf, cost = glm.fit(logr.logistic_log_likelihood_i,
 logr.plot_cost(cost)
 print(h_thetaf)
 
-yp_train = glm.predict(logr.logistic, scaledX_train, h_thetaf)
-print(tabulate(list(zip(yp_train, map(round, yp_train), y_train)), 
-                headers=['yp', 'Predicted Class', 'Actual Class'],
-                tablefmt='fancy_grid'))
-
+probs_train = glm.predict(logr.logistic, scaledX_train, h_thetaf)
+yp_train = logr.logistic_classes(probs_train)
+logistic_table(probs_train, yp_train, y_train)
 print('\n--Testing--')
 # Use the training statistics to scale the test data
 X_test, y_test = zip(*test_data)
 scaledX_test = transform(X_test)
 scaled_test = zip(scaledX_test, y_test)
-yp_test = glm.predict(logr.logistic, scaledX_test, h_thetaf)
-print(tabulate(list(zip(yp_test, map(round, yp_test), y_test)), 
-                headers=['yp', 'Predicted Class', 'Actual Class'],
-                tablefmt='fancy_grid'))
+probs_test = glm.predict(logr.logistic, scaledX_test, h_thetaf)
+yp_test = logr.logistic_classes(probs_test)
+logistic_table(probs_test, yp_test, y_test)
