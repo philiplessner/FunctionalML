@@ -4,7 +4,7 @@ from toolz import pluck, compose
 from tabulate import tabulate
 from utility import csv_reader, Scaler, prepend_x0, dot
 import logistic_regression as logr
-import linear_regression as linr
+import glm
 from ml_util import train_test_split
 
 
@@ -35,7 +35,7 @@ scaled_train = zip(scaledX_train, y_train)
 h_theta0 = [1., 1., 1.]
 print('****Gradient Descent****')
 print('--Training--')
-h_thetaf, cost = linr.fit(logr.logistic_log_likelihood,
+h_thetaf, cost = glm.fit(logr.logistic_log_likelihood,
                                 logr.grad_logistic,
                                 h_theta0,
                                 scaled_train,
@@ -46,7 +46,7 @@ h_thetaf, cost = linr.fit(logr.logistic_log_likelihood,
 logr.plot_cost(cost)
 print(h_thetaf)
 
-yp_train = logr.predict(logr.logistic, scaledX_train, h_thetaf)
+yp_train = glm.predict(logr.logistic, scaledX_train, h_thetaf)
 print(tabulate(list(zip(yp_train, map(round, yp_train), y_train)), 
                 headers=['yp', 'Predicted Class', 'Actual Class'],
                 tablefmt='fancy_grid'))
@@ -56,14 +56,14 @@ print('--Testing--')
 X_test, y_test = zip(*test_data)
 scaledX_test = transform(X_test)
 scaled_test = zip(scaledX_test, y_test)
-yp_test = logr.predict(logr.logistic, scaledX_test, h_thetaf)
+yp_test = glm.predict(logr.logistic, scaledX_test, h_thetaf)
 print(tabulate(list(zip(yp_test, map(round, yp_test), y_test)), 
                 headers=['yp', 'Predicted Class', 'Actual Class'],
                 tablefmt='fancy_grid'))
 
 print('\n\n****Stochastic Gradient Descent****')
 print('\n--Training--')
-h_thetaf, cost = linr.fit(logr.logistic_log_likelihood_i,
+h_thetaf, cost = glm.fit(logr.logistic_log_likelihood_i,
                                 logr.logistic_log_gradient_i,
                                 h_theta0,
                                 scaled_train,
@@ -73,7 +73,7 @@ h_thetaf, cost = linr.fit(logr.logistic_log_likelihood_i,
 logr.plot_cost(cost)
 print(h_thetaf)
 
-yp_train = logr.predict(logr.logistic, scaledX_train, h_thetaf)
+yp_train = glm.predict(logr.logistic, scaledX_train, h_thetaf)
 print(tabulate(list(zip(yp_train, map(round, yp_train), y_train)), 
                 headers=['yp', 'Predicted Class', 'Actual Class'],
                 tablefmt='fancy_grid'))
@@ -83,7 +83,7 @@ print('\n--Testing--')
 X_test, y_test = zip(*test_data)
 scaledX_test = transform(X_test)
 scaled_test = zip(scaledX_test, y_test)
-yp_test = logr.predict(logr.logistic, scaledX_test, h_thetaf)
+yp_test = glm.predict(logr.logistic, scaledX_test, h_thetaf)
 print(tabulate(list(zip(yp_test, map(round, yp_test), y_test)), 
                 headers=['yp', 'Predicted Class', 'Actual Class'],
                 tablefmt='fancy_grid'))

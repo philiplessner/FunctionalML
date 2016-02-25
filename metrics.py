@@ -1,4 +1,5 @@
 # coding: utf-8
+from __future__ import division
 from linear_regression import error
 from utility import mean
 
@@ -19,6 +20,19 @@ def r2(X, y, h_theta):
                                 for xi, yi in zip(X, y))
     return 1.0 - sum_of_squared_errors / total_sum_of_squares(y)
     
+def scores(y, yp):
+    true_positives = false_positives = true_negatives = false_negatives = 0
+    for yi, ypi in zip(y, yp):
+        if yi == 1 and ypi == 1:
+            true_positives += 1
+        elif yi == 1 and ypi == 0:
+            false_negatives += 1
+        elif yi == 0 and ypi == 1:
+            false_positives += 1
+        else:
+            true_negatives += 1
+    return true_positives, false_positives, false_negatives, true_negatives
+
 
 def accuracy(tp, fp, fn, tn):
     correct = tp + tn
